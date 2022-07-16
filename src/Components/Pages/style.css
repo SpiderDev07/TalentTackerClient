@@ -1,0 +1,18 @@
+.email-template {
+    box-shadow: 0px 0px 2px rgb(187, 186, 186);
+    
+    height: calc(160vh - 0px);
+    border-radius: 10px;
+}
+.submit {
+    margin-top: 8rem;
+}
+.template {
+    margin-top: 8rem;
+}
+.template .card .card-body .cardTitle{
+    padding: 14px 16px;
+    background-color: #e6ecff;
+    color: #7367f0;
+    border-radius: 6px;
+}

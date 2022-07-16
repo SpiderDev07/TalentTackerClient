@@ -1,0 +1,29 @@
+.myworkspace {
+    margin-top: 7.5rem;
+}
+.add-candidate {
+    text-align: center;
+    color: blueviolet;
+}
+.showcheckbox {
+    display: none !important;
+}
+.showskill{
+    display: none !important;
+}
+.showdropdown {
+    display: none !important;
+}
+.modal-bg {
+    background:url('/public/images/slide4.jpg');
+}
+.modal-bg .inner-item{
+
+    margin-top: 5rem;
+}
+@media(max-width:768px) {
+    .modal-bg .inner-item{
+
+        margin-top: 5rem;
+    }
+}
