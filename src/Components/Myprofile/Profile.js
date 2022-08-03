@@ -82,8 +82,6 @@ const Profile = () => {
     useEffect(() => {
         const fetchPost = async () => {
             const res = await axios.get(`http://162.240.67.205:5000/api/allUser`);
-            let f = await axios.get(`http://162.240.67.205:5000/api/usersbyId/62e9395506de3ce1e5da380a`);
-            console.log(f)
             setgetdata(res.data);
         }
         fetchPost();
@@ -95,10 +93,16 @@ const Profile = () => {
     }, [fetchBankInfo, fetchWorkInfo, userId]);
 
     // -------------------END HERE-----------------------------
-
+const [personalinfoFormValidated, setpersonalinfoFormValidated] = useState(false);
     // ---------------------UPDATE PERSONAL INFO-------------------
-    const UpdatePInfo = (e) => {
-        e.preventDefault();
+    const UpdatePInfo = (event) => {
+        const form = event.currentTarget;
+        event.preventDefault();
+        if (!form.checkValidity()) {
+            event.stopPropagation();
+            setpersonalinfoFormValidated(true);
+            return;
+        }
         axios.put(`http://162.240.67.205:5000/api/udateUser/${id}`, {
             firstname: fname,
             lastname: lname,
@@ -124,7 +128,6 @@ const Profile = () => {
     // ---------Add bank Detail-------------
     const [bankValidated, setBankValidated] = useState(false)
     const handleSubmitInBankDetails = (event) => {
-        console.log(user)
         const form = event.currentTarget;
         event.preventDefault();
         if (!form.checkValidity()) {
@@ -170,6 +173,7 @@ const Profile = () => {
     const submithandleform2 = (event) => {
         const form = event.currentTarget;
         event.preventDefault();
+        console.log(form.checkValidity())
         if (!form.checkValidity()) {
             event.stopPropagation();
             setWorkFormValidated(true);
@@ -196,11 +200,11 @@ const Profile = () => {
             GSTProof: userWORK.GSTProof
         }).then(res => {
             if (res && res.status === 200) {
-                alert("sucessfully inserted")
+                toast.success("Work Detailes sucessfully updated")
                 // navigate('/');
             }
             else if (res && res.status === 400) {
-                alert("Email all ready exists try other email")
+                toast.error(res.statusText)
             }
             else {
                 alert("try again")
@@ -449,18 +453,24 @@ const Profile = () => {
                                         </Tab>
                                         {/* <---------------------PERSONAL INFORMATION DETAIL START--------------------> */}
                                         <Tab eventKey="personal information" title="Personal Information" >
-                                            <Form  >
+                                            <Form noValidate validated={personalinfoFormValidated} onSubmit={UpdatePInfo} >
                                                 <Row>
                                                     <Col xs={6}>
                                                         <Form.Group className='mb-3'>
                                                             <Form.Label>First Name</Form.Label>
-                                                            <Form.Control type='text' value={fname} name="fname" onChange={(e) => setfname(e.target.value)} />
+                                                            <Form.Control type='text' value={fname} name="fname" onChange={(e) => setfname(e.target.value)} required />
+                                                             <Form.Control.Feedback type="invalid">
+                                                                Please enter first name
+                                                            </Form.Control.Feedback>
                                                         </Form.Group>
                                                     </Col>
                                                     <Col xs={6}>
                                                         <Form.Group className='mb-3'>
                                                             <Form.Label>Last Name</Form.Label>
-                                                            <Form.Control type='text' name="lastname" value={lname} onChange={(e) => setlname(e.target.value)} />
+                                                            <Form.Control type='text' name="lastname" value={lname} onChange={(e) => setlname(e.target.value)} required />
+                                                            <Form.Control.Feedback type="invalid">
+                                                                Please enter last name
+                                                            </Form.Control.Feedback>
                                                         </Form.Group>
                                                     </Col>
                                                 </Row>
@@ -468,13 +478,19 @@ const Profile = () => {
                                                     <Col xs={6}>
                                                         <Form.Group className='mb-3'>
                                                             <Form.Label>Personal Email</Form.Label>
-                                                            <Form.Control type='email' value={pemail} name="pemail" onChange={(e) => setpemail(e.target.value)} />
+                                                            <Form.Control type='email' value={pemail} name="pemail" onChange={(e) => setpemail(e.target.value)} required />
+                                                            <Form.Control.Feedback type="invalid">
+                                                                Please enter email
+                                                            </Form.Control.Feedback>
                                                         </Form.Group>
                                                     </Col>
                                                     <Col xs={6}>
                                                         <Form.Group className='mb-3'>
                                                             <Form.Label>Mobile No.</Form.Label>
-                                                            <Form.Control type='tel' name="phone" value={mobile} onChange={(e) => setmobile(e.target.value)} />
+                                                            <Form.Control type='tel' name="phone" value={mobile} onChange={(e) => setmobile(e.target.value)} required />
+                                                            <Form.Control.Feedback type="invalid">
+                                                                Please enter mobile number
+                                                            </Form.Control.Feedback>
                                                         </Form.Group>
                                                     </Col>
                                                 </Row>
@@ -487,10 +503,15 @@ const Profile = () => {
                                                                     value="Male"
                                                                     name="gender"
                                                                     label="Male"
-                                                                    onChange={(e) => setgender(e.target.value)}
+                                                                    onChange={(e) => setgender("Male")}
                                                                     checked={gender === "Male"}
+                                                                    required
                                                                 />
-                                                                <Form.Check type='radio' className='mx-2' value="Female" name="gender" label="Female" onChange={(e) => setgender(e.target.value)} checked={gender === "Female"} />
+                                                                <Form.Check type='radio' className='mx-2' value="Female" name="gender" label="Female" onChange={(e) => setgender("Female")} checked={gender === "Female"} required />
+
+                                                                <Form.Control.Feedback type="invalid">
+                                                                Please choose gender
+                                                            </Form.Control.Feedback>
                                                             </div>
                                                         </Form.Group>
                                                     </Col>
@@ -500,12 +521,16 @@ const Profile = () => {
                                                     <Col xs={12}>
                                                         <Form.Group className='mb-3'>
                                                             <Form.Label>Current Location</Form.Label>
-                                                            <Form.Control as="textarea" rows={3} name="address" value={location} onChange={(e) => setlocation(e.target.value)} />
+                                                            <Form.Control as="textarea" rows={3} name="address" value={location} onChange={(e) => setlocation(e.target.value)} required />
+                                                            
+                                                            <Form.Control.Feedback type="invalid">
+                                                                Please enter current location
+                                                            </Form.Control.Feedback>
                                                         </Form.Group>
                                                     </Col>
 
                                                 </Row>
-                                                <Button variant='primary' type='submit' onClick={UpdatePInfo}>Save</Button>
+                                                <Button variant='primary' type='submit'>Save</Button>
                                             </Form>
 
                                         </Tab>
@@ -566,7 +591,7 @@ const Profile = () => {
                                                     <Col xs={4} className={select1 ? 'showticked' : 'showticked1'}>
                                                         <Form.Group className='mb-3 mt-2' >
                                                             <Form.Label>Certificate of incorporation (if consultancy)<span style={{ color: "red" }}>*</span></Form.Label>
-                                                            <Form.Control type='file' id='WIconProofk' name="WIconProof" value={userWORK.WIconProof} onChange={handleChangeInWrokTab} required />
+                                                            <Form.Control type='file' id='WIconProofk' name="WIconProof" value={userWORK.WIconProof} onChange={handleChangeInWrokTab} />
                                                             <Form.Control.Feedback type="invalid">
                                                                 Please choose a any one option
                                                             </Form.Control.Feedback>
@@ -577,19 +602,13 @@ const Profile = () => {
                                                     <Col xs={4} className={select1 ? 'showticked' : 'showticked1'}>
                                                         <Form.Group className='mb-3 mt-2'>
                                                             <Form.Label>GST number <span style={{ color: "red" }}>*</span></Form.Label>
-                                                            <Form.Control type='number' id='GST' name="GST" value={userWORK.GST} onChange={handleChangeInWrokTab} required />
-                                                            <Form.Control.Feedback type="invalid">
-                                                                Please choose a any one option
-                                                            </Form.Control.Feedback>
+                                                            <Form.Control type='number' id='GST' name="GST" value={userWORK.GST} onChange={handleChangeInWrokTab} />
                                                         </Form.Group>
                                                     </Col>
                                                     <Col xs={4} className={select1 ? 'showticked' : 'showticked1'}>
                                                         <Form.Group className='mb-3 mt-2'>
                                                             <Form.Label>GST certificate <span style={{ color: "red" }}>*</span></Form.Label>
-                                                            <Form.Control type='file' id='GSTProof' name="GSTProof" value={userWORK.GSTProof} onChange={handleChangeInWrokTab} required />
-                                                            <Form.Control.Feedback type="invalid">
-                                                                Please choose a any one option
-                                                            </Form.Control.Feedback>
+                                                            <Form.Control type='file' id='GSTProof' name="GSTProof" value={userWORK.GSTProof} onChange={handleChangeInWrokTab} />
                                                         </Form.Group>
                                                     </Col>
                                                     <Col xs={4}>
@@ -620,8 +639,8 @@ const Profile = () => {
                                                         <Form.Group className='mb-3 mt-2'>
                                                             <Form.Label>Currently employed for some organization as a full time employee</Form.Label>
                                                             <div className='d-flex'>
-                                                                <Form.Check type='radio' id='BDNameofbank' name="BDNameofbank" data-value="Yes" value={userWORK.BDNameofbank} onChange={handleChangeInWrokTab} label="Yes" required />
-                                                                <Form.Check type='radio' id='BDNameofbank' name="BDNameofbank" data-value="No" value={userWORK.BDNameofbank} onChange={handleChangeInWrokTab} label="No" required className='mx-3' />
+                                                                <Form.Check type='radio' id='WIcurrempstatus' name="WIcurrempstatus" data-value="Yes" value={userWORK.WIcurrempstatus} onChange={handleChangeInWrokTab} label="Yes" required />
+                                                                <Form.Check type='radio' id='WIcurrempstatus' name="WIcurrempstatus" data-value="No" value={userWORK.WIcurrempstatus} onChange={handleChangeInWrokTab} label="No" required className='mx-3' />
                                                             </div>
                                                             <Form.Control.Feedback type="invalid">
                                                                 Please choose a any one option
@@ -647,9 +666,9 @@ const Profile = () => {
                                                         <Form.Group className='mb-3 mt-2'>
                                                             <Form.Label>Own portal available? <span style={{ color: "red" }}>*</span></Form.Label>
                                                             <Form.Select
-                                                                value={userWORK.WIOwnportal}
-                                                                onChange={(value) => handleChangeInWrokTab(value, "WIOwnportal")}
-                                                                name='WIOwnportal'
+                                                                value={userWORK.WIOwnportalavailable}
+                                                                onChange={handleChangeInWrokTab}
+                                                                name='WIOwnportalavailable'
                                                                 required
                                                             >
                                                                 <option value="">Choose</option>
